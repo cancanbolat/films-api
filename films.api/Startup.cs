@@ -27,11 +27,12 @@ namespace films.api
         readonly string MyAllowOrigins = "_myAllowOrigins";
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(); //AddNewtonsoftJson();
 
             services.Configure<MongoDatabaseSettings>(Configuration.GetSection(nameof(MongoDatabaseSettings)));
             services.AddSingleton<IMongoDatabaseSettings>(options => options.GetRequiredService<IOptions<MongoDatabaseSettings>>().Value);
             services.AddScoped<MongoService>();
+
+            services.AddControllers().AddNewtonsoftJson();
 
             #region CORS
             services.AddCors(options =>
