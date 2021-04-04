@@ -13,8 +13,8 @@ namespace films.api.Controllers
     [Route("api/[controller]")]
     public class FilmsController : ControllerBase
     {
-        private readonly MongoService _service;
-        public FilmsController(MongoService service)
+        private readonly FilmService _service;
+        public FilmsController(FilmService service)
         {
             _service = service;
         }
@@ -22,7 +22,7 @@ namespace films.api.Controllers
         [HttpGet]
         public ActionResult<List<Films>> Get() => _service.GetAll();
 
-        [HttpGet("{id:length(24)}", Name = "GetById")]
+        [HttpGet("{id:length(24)}", Name = "GetFilm")]
         public ActionResult<Films> Get(string id)
         {
             var film = _service.GetById(id);
@@ -37,7 +37,7 @@ namespace films.api.Controllers
         public IActionResult Create(Films model)
         {
             _service.Add(model);
-            return CreatedAtRoute("GetById", new { id = model.Id }, model);
+            return CreatedAtRoute("GetFilm", new { id = model.Id }, model);
         }
 
         [HttpPut("{id:length(24)}")]
