@@ -4,6 +4,7 @@
 ````
 use FilmsApi
 
+
 db.createCollection('Films')
 
 db.Films.insertMany([
@@ -12,6 +13,16 @@ db.Films.insertMany([
 	{Title: 'Attack on Titan', Year: '2013', Imdb: 8.9},
 	{Title: 'Line of Duty', Year: '2012', Imdb: 8.7},
 	{Title: 'The Walking Dead', Year: '2010', Imdb: 8.2},
+])
+
+
+db.createCollection('Cast')
+
+db.Cast.insertMany([
+	{Name: 'Gil', Surname: 'Bellows'},
+	{Name: ''Clancy, Surname: 'Brown'},
+	{Name: ''William, Surname: 'Sadler'},
+	{Name: ''Morgan , Surname: 'Freeman'}
 ])
 
 ````
