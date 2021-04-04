@@ -1,3 +1,4 @@
+using films.api.Services;
 using films.api.Services.Mongo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,7 +31,11 @@ namespace films.api
 
             services.Configure<MongoDatabaseSettings>(Configuration.GetSection(nameof(MongoDatabaseSettings)));
             services.AddSingleton<IMongoDatabaseSettings>(options => options.GetRequiredService<IOptions<MongoDatabaseSettings>>().Value);
-            services.AddScoped<MongoService>();
+
+            #region Life Cycles
+            services.AddScoped<FilmService>();
+            services.AddScoped<CastService>();
+            #endregion
 
             services.AddControllers().AddNewtonsoftJson();
 
