@@ -66,8 +66,10 @@ namespace films.api
             }
 
             app.UseHttpsRedirection();
-
+            
             app.UseRouting();
+
+            app.UseCors(MyAllowOrigins);
 
             app.UseAuthorization();
 
