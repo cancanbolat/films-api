@@ -37,8 +37,12 @@ namespace films.api
             services.AddScoped<CastService>();
             #endregion
 
+            services.AddResponseCaching();
             services.AddMemoryCache(); // In Memory Cache
-            services.AddControllers().AddNewtonsoftJson();
+
+            services.AddControllers(op =>
+                op.CacheProfiles.Add("Duration20Cache", new CacheProfile { Duration = 20 })
+            ).AddNewtonsoftJson();
 
             #region CORS
             services.AddCors(options =>
@@ -67,10 +71,11 @@ namespace films.api
             }
 
             app.UseHttpsRedirection();
-            
+
             app.UseRouting();
 
             app.UseCors(MyAllowOrigins);
+            app.UseResponseCaching();
 
             app.UseAuthorization();
 

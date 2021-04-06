@@ -41,6 +41,7 @@ namespace films.api.Controllers
         }
 
         [HttpGet("{id:length(24)}", Name = "GetFilm")]
+        [ResponseCache(CacheProfileName = "Duration20Cache")]
         public ActionResult<Films> Get(string id)
         {
             var film = _service.GetById(id);
