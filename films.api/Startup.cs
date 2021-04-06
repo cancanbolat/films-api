@@ -37,6 +37,7 @@ namespace films.api
             services.AddScoped<CastService>();
             #endregion
 
+            services.AddMemoryCache(); // In Memory Cache
             services.AddControllers().AddNewtonsoftJson();
 
             #region CORS
