@@ -2,17 +2,15 @@ using films.api.Services;
 using films.api.Services.Mongo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.IO;
+using Microsoft.OpenApi.Models;
 
 namespace films.api
 {
@@ -31,6 +29,29 @@ namespace films.api
 
             services.Configure<MongoDatabaseSettings>(Configuration.GetSection(nameof(MongoDatabaseSettings)));
             services.AddSingleton<IMongoDatabaseSettings>(options => options.GetRequiredService<IOptions<MongoDatabaseSettings>>().Value);
+
+            #region Swagger
+            services.AddSwaggerGen(s =>
+            {
+                s.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Films API",
+                    Description = "ASP Net Core Films API. Mongo DB and Generic Repository.",
+                    TermsOfService = new Uri("https://www.cancanbolat.site"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Can Canbolat",
+                        Email = "canxmcclyn@gmail.com"
+                    }
+                });
+
+                // XML
+                var xmlFile = $"{ Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                s.IncludeXmlComments(xmlPath);
+            });
+            #endregion
 
             #region Life Cycles
             services.AddScoped<FilmService>();
@@ -74,8 +95,13 @@ namespace films.api
 
             app.UseRouting();
 
-            app.UseCors(MyAllowOrigins);
-            app.UseResponseCaching();
+            app.UseCors(MyAllowOrigins); //cors
+            app.UseResponseCaching(); //cache
+
+            #region Swagger
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            #endregion
 
             app.UseAuthorization();
 
