@@ -27,7 +27,11 @@ namespace films.api
         readonly string MyAllowOrigins = "_myAllowOrigins";
         public void ConfigureServices(IServiceCollection services)
         {
+            // Problems
             services.AddProblemDetails();
+
+            //AutoMapper
+            services.AddAutoMapper(typeof(Startup));
 
             services.Configure<MongoDatabaseSettings>(Configuration.GetSection(nameof(MongoDatabaseSettings)));
             services.AddSingleton<IMongoDatabaseSettings>(options => options.GetRequiredService<IOptions<MongoDatabaseSettings>>().Value);
@@ -60,8 +64,7 @@ namespace films.api
             services.AddScoped<CastService>();
             #endregion
 
-            services.AddResponseCaching();
-            services.AddMemoryCache(); // In Memory Cache
+            services.AddResponseCaching(); // response cache
 
             services.AddControllers(op =>
                 op.CacheProfiles.Add("Duration20Cache", new CacheProfile { Duration = 20 })
@@ -92,6 +95,8 @@ namespace films.api
                 app.UseDeveloperExceptionPage();
 
             }
+
+            //Problems
             app.UseProblemDetails();
 
             app.UseHttpsRedirection();
