@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using System.IO;
 using Microsoft.OpenApi.Models;
+using Hellang.Middleware.ProblemDetails;
 
 namespace films.api
 {
@@ -26,6 +27,7 @@ namespace films.api
         readonly string MyAllowOrigins = "_myAllowOrigins";
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddProblemDetails();
 
             services.Configure<MongoDatabaseSettings>(Configuration.GetSection(nameof(MongoDatabaseSettings)));
             services.AddSingleton<IMongoDatabaseSettings>(options => options.GetRequiredService<IOptions<MongoDatabaseSettings>>().Value);
@@ -90,6 +92,7 @@ namespace films.api
                 app.UseDeveloperExceptionPage();
 
             }
+            app.UseProblemDetails();
 
             app.UseHttpsRedirection();
 
