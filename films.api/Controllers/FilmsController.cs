@@ -1,4 +1,6 @@
-﻿using films.api.Models.Mongo;
+﻿using AutoMapper;
+using films.api.DTO;
+using films.api.Models.Mongo;
 using films.api.Services.Mongo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,28 +17,23 @@ namespace films.api.Controllers
     public class FilmsController : ControllerBase
     {
         private readonly FilmService _service;
-        IMemoryCache _memoryCache;
-        public FilmsController(FilmService service, IMemoryCache memoryCache)
+        private readonly IMapper _mapper;
+
+        public FilmsController(FilmService service, IMapper mapper)
         {
             _service = service;
-            _memoryCache = memoryCache;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public ActionResult<List<Films>> Get()
         {
-            const string key = "films";
-            
-            if(_memoryCache.TryGetValue(key, out object list))
-                return Ok(list);
-
             var films = _service.GetAll();
-            _memoryCache.Set(key, films, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddSeconds(30),
-                Priority = CacheItemPriority.Normal
-            });
-            return Ok(films);
+
+            //AutoMapper
+            var result = _mapper.Map<List<FilmsDTO>>(films);
+
+            return Ok(result);
 
         }
 
