@@ -1,4 +1,7 @@
-﻿### ASP Net Core Mongo DB simple web api
+﻿### ASP Net Core Mongo DB Web Api. Using Generic Repository
+
+### Swagger UI
+<img src="screenshots/swagger-1.png"/>
 
 #### Database Queries
 ````
@@ -20,9 +23,9 @@ db.createCollection('Cast')
 
 db.Cast.insertMany([
 	{Name: 'Gil', Surname: 'Bellows'},
-	{Name: ''Clancy, Surname: 'Brown'},
-	{Name: ''William, Surname: 'Sadler'},
-	{Name: ''Morgan , Surname: 'Freeman'}
+	{Name: 'Clancy', Surname: 'Brown'},
+	{Name: 'William', Surname: 'Sadler'},
+	{Name: 'Morgan' , Surname: 'Freeman'}
 ])
 
 ````
