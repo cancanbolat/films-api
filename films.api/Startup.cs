@@ -12,6 +12,11 @@ using System.Reflection;
 using System.IO;
 using Microsoft.OpenApi.Models;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Text.Json;
+using System.Linq;
+using System.Net.Mime;
+using Microsoft.AspNetCore.Http;
 
 namespace films.api
 {
@@ -33,7 +38,8 @@ namespace films.api
             //AutoMapper
             services.AddAutoMapper(typeof(Startup));
 
-            services.Configure<MongoDatabaseSettings>(Configuration.GetSection(nameof(MongoDatabaseSettings)));
+            var mongoDbSettings = Configuration.GetSection(nameof(MongoDatabaseSettings));
+            services.Configure<MongoDatabaseSettings>(mongoDbSettings);
             services.AddSingleton<IMongoDatabaseSettings>(options => options.GetRequiredService<IOptions<MongoDatabaseSettings>>().Value);
 
             #region Swagger
@@ -77,13 +83,18 @@ namespace films.api
                     name: MyAllowOrigins,
                     builder =>
                     {
-                        builder
-                               .AllowAnyOrigin()
-                               .AllowAnyHeader()
-                               .AllowAnyMethod();
-                    }
-                    );
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    });
             });
+            #endregion
+
+            #region Health Checks
+            services.AddHealthChecks().AddMongoDb(
+                    Configuration["MongoDatabaseSettings:ConnectionString"],
+                    name: "FilmsApi",
+                    timeout: TimeSpan.FromSeconds(3),
+                    tags: new[] { "ready" }
+                );
             #endregion
         }
 
@@ -93,7 +104,6 @@ namespace films.api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
             }
 
             //Problems
@@ -116,6 +126,32 @@ namespace films.api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                #region Health Checks
+                endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions
+                {
+                    Predicate = (check) => check.Tags.Contains("ready"),
+                    ResponseWriter = async (context, report) =>
+                    {
+                        var result = JsonSerializer.Serialize(
+                            new
+                            {
+                                status = report.Status.ToString(),
+                                checks = report.Entries.Select(e => new
+                                {
+                                    name = e.Key,
+                                    status = e.Value.Status.ToString(),
+                                    exception = e.Value.Exception != null ? e.Value.Exception.Message : "none",
+                                    duration = e.Value.Duration
+                                })
+                            }
+                        );
+
+                        context.Response.ContentType = MediaTypeNames.Application.Json;
+                        await context.Response.WriteAsync(result);
+                    }
+                });
+                #endregion
             });
         }
     }
